@@ -16,7 +16,8 @@ struct InstructionView: View {
                 Image(.appiconwithradius)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 200)
+                    .frame(width: 150)
+                    .padding(.top, 24)
                 
                 Spacer()
                 
