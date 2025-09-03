@@ -4,6 +4,7 @@ import AVKit
 struct ContentView: View {
     @State private var animateViewsIn = false
     @State private var audioPlayer: AVAudioPlayer!
+    @State private var playGame = false
     
     
     var body: some View {
@@ -20,7 +21,7 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    ButtonBarView(animateViewsIn: $animateViewsIn, geo: geo)
+                    ButtonBarView(animateViewsIn: $animateViewsIn, playGame: $playGame, geo: geo)
                     
                     Spacer()
                 }
@@ -30,7 +31,13 @@ struct ContentView: View {
         .ignoresSafeArea()
         .onAppear {
             animateViewsIn.toggle()
-//            playAudio()
+            playAudio()
+        }
+        .fullScreenCover(isPresented: $playGame) {
+            QuestionView()
+                .onAppear {
+                    audioPlayer.setVolume(0, fadeDuration: 1.5)
+                }
         }
         
     }

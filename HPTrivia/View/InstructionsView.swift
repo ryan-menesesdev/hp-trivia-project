@@ -28,7 +28,7 @@ struct InstructionView: View {
                 Spacer()
                 
                 ScrollView {
-                    VStack(alignment:.leading, spacing: 20) {
+                    VStack(alignment:.leading, spacing: 30) {
                         Text("Welcome to HP Trivia! In this game you will be asked random questions from the HP books and you must guess the right answer or you will lose points!😱")
                         
                         Text("Each question is worth 5 points, but if you guess a wrong answer, you lose 1 point.")

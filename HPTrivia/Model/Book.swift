@@ -3,8 +3,8 @@ struct Book: Identifiable {
     let image: String
     let questions: [Question]
     var status: BookStatus
-    
-    enum BookStatus {
-        case active, inactive, locked
-    }
+}
+
+enum BookStatus {
+    case active, inactive, locked
 }

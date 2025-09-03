@@ -10,6 +10,17 @@ import SwiftUI
 struct SelectBooksView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(GameViewModel.self) private var game
+    @State private var showFakeAlert = false
+    
+    var activeBooks: Bool {
+        for book in game.fetcher.books {
+            if book.status == .active {
+                return true
+            }
+        }
+        
+        return false
+    }
     
     var body: some View {
         ZStack {
@@ -19,7 +30,6 @@ struct SelectBooksView: View {
                 .ignoresSafeArea()
                 .background(.brown)
                 
-            
             VStack(alignment: .center) {
                 Spacer()
                 
@@ -33,40 +43,35 @@ struct SelectBooksView: View {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(), GridItem()]) {
                         ForEach(game.fetcher.books) { book in
-                            if book.status == .active {
-                                ZStack(alignment: .bottomTrailing) {
-                                    Image(book.image)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .shadow(radius: 8)
-                                    
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .font(.largeTitle)
-                                        .imageScale(.large)
-                                        .foregroundStyle(.green)
-                                        .shadow(radius: 2)
-                                        .padding(3)
-                                    
-                                }
-                            } else if book.status == .inactive {
-                                ZStack {
-                                    Image(book.image)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .shadow(radius: 8)
-                                }
-                            } else {
-                                ZStack {
-                                    Image(book.image)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .shadow(radius: 8)
-                                }
+                            switch book.status {
+                            case .active:
+                                ActiveBookView(book: book)
+                                    .onTapGesture {
+                                        game.fetcher.changeBookStatus(of: book.id, to: .inactive)
+                                    }
+                            case .inactive:
+                                InactiveBookView(book: book)
+                                    .onTapGesture {
+                                        game.fetcher.changeBookStatus(of: book.id, to: .active)
+                                    }
+                            default:
+                                LockedBookView(book: book)
+                                    .onTapGesture {
+                                        showFakeAlert.toggle()
+                                        
+                                        game.fetcher.changeBookStatus(of: book.id, to: .active)
+                                    }
                             }
                         }
                     }
                 }
                 .foregroundStyle(.black)
+                
+                if !activeBooks {
+                    Text("You must select at least one book.")
+                        .foregroundStyle(.black)
+                        .multilineTextAlignment(.center)
+                }
                 
                 Button {
                     dismiss()
@@ -78,8 +83,14 @@ struct SelectBooksView: View {
                 .padding(8)
                 .background(.brown.opacity(0.7))
                 .clipShape(.rect(cornerRadius: 8))
+                .disabled(!activeBooks)
             }
             .padding(.horizontal, 20)
+            .padding(.top, 40)
+        }
+        .interactiveDismissDisabled(!activeBooks)
+        .alert("You have purchased the selected content! Enjoy 😄", isPresented: $showFakeAlert) {
+            
         }
     }
 }
