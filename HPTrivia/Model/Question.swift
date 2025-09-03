@@ -1,4 +1,4 @@
-struct Model: Decodable {
+struct Question: Decodable {
     var id: Int
     var question: String
     var answer: String

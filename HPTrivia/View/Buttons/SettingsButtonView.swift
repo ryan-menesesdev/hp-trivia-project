@@ -29,7 +29,7 @@ struct SettingsButtonView: View {
         }
         .animation(.easeOut(duration: 0.7).delay(2.7), value: animateViewsIn)
         .sheet(isPresented: $settingsTapped) {
-            SettingsView()
+            SelectBooksView()
         }
     }
 }
@@ -37,5 +37,6 @@ struct SettingsButtonView: View {
 #Preview {
     GeometryReader { geo in
         SettingsButtonView(animateViewsIn: .constant(true), geo: geo)
+            .environment(GameViewModel())
     }
 }

@@ -44,6 +44,7 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environment(GameViewModel())
 }
 
 
