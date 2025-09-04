@@ -1,10 +1,3 @@
-//
-//  SelectBooksView.swift
-//  HPTrivia
-//
-//  Created by Ryan Davi Oliveira de Meneses on 02/09/25.
-//
-
 import SwiftUI
 
 struct SelectBooksView: View {

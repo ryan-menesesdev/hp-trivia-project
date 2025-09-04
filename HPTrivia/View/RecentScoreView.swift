@@ -1,13 +1,7 @@
-//
-//  RecentScoreView.swift
-//  HPTrivia
-//
-//  Created by Ryan Davi Oliveira de Meneses on 02/09/25.
-//
-
 import SwiftUI
 
 struct RecentScoreView: View {
+    @Environment(GameViewModel.self) private var game
     @Binding var animateViewsIn: Bool
     
     var body: some View {
@@ -17,11 +11,9 @@ struct RecentScoreView: View {
                     Text("Recent Scores")
                         .font(.title2)
                     
-                    Text("12")
-                    
-                    Text("12")
-                    
-                    Text("12")
+                    Text("\(game.recentScores[0])")
+                    Text("\(game.recentScores[1])")
+                    Text("\(game.recentScores[2])")
                 }
                 .foregroundStyle(.white)
                 .font(.title3)
@@ -37,4 +29,5 @@ struct RecentScoreView: View {
 
 #Preview {
     RecentScoreView(animateViewsIn: .constant(true))
+        .environment(GameViewModel())
 }
