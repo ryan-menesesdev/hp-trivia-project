@@ -52,7 +52,10 @@ class GameViewModel {
     
     func correct() {
         answeredQuestions.append(currentQuestion.id)
-        score += correctAnswerScore
+        
+        withAnimation {
+            score += correctAnswerScore
+        }
     }
     
     func endGame() {
