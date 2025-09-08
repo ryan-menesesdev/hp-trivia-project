@@ -14,6 +14,12 @@ class GameViewModel {
     
     var answers = [String]()
     
+    let savePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "recentScores")
+    
+    init() {
+        loadScores()
+    }
+    
     func startGame() {
         for book in fetcher.books {
             if book.status == .active {
@@ -63,8 +69,28 @@ class GameViewModel {
         recentScores[1] = recentScores[0]
         recentScores[0] = score
         
+        saveScores()
+        
         score = 0
         activeQuestions = []
         answeredQuestions = []
+    }
+    
+    func saveScores() {
+        do {
+            let data = try JSONEncoder().encode(recentScores)
+            try data.write(to: savePath)
+        } catch {
+            print("Unable to save data: \(error)")
+        }
+    }
+    
+    func loadScores() {
+        do {
+            let data = try Data(contentsOf: savePath)
+            recentScores = try JSONDecoder().decode([Int].self, from: data)
+        } catch {
+            recentScores = [0, 0, 0]
+        }
     }
 }

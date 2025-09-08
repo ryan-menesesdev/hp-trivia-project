@@ -192,7 +192,7 @@ struct QuestionView: View {
                                     VStack {
                                         if animateViewsIn {
                                             Button {
-                                                game.score -= 1
+                                                game.correctAnswerScore -= 1
                                                 withAnimation(.easeOut(duration: animateViewsIn ? 1 : 0)) {
                                                     wrongAnswerTapped.append(answer)
                                                 }
@@ -277,7 +277,7 @@ struct QuestionView: View {
                             Button {
                                 animateViewsIn = false
                                 revealHint = false
-                                revealBook = false
+                                revealBook = false 
                                 correctAnswerTapped = false
                                 wrongAnswerTapped = []
                                 movePointsToScore = false
@@ -288,7 +288,7 @@ struct QuestionView: View {
                                     animateViewsIn = true
                                 }
                             } label: {
-                                Text("Next Level ->")
+                                Text("Next Level")
                                     .font(.largeTitle)
                             }
                             .buttonStyle(.borderedProminent)
@@ -314,7 +314,7 @@ struct QuestionView: View {
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                playMusic()
+                playMusic()
             }
         }
     }

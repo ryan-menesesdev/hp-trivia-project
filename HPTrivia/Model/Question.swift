@@ -1,4 +1,4 @@
-struct Question: Decodable {
+struct Question: Codable {
     var id: Int
     var question: String
     var answer: String

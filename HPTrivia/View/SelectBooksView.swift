@@ -3,7 +3,8 @@ import SwiftUI
 struct SelectBooksView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(GameViewModel.self) private var game
-    @State private var showFakeAlert = false
+    
+    private var store = StoreViewModel()
     
     var activeBooks: Bool {
         for book in game.fetcher.books {
@@ -36,23 +37,26 @@ struct SelectBooksView: View {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(), GridItem()]) {
                         ForEach(game.fetcher.books) { book in
-                            switch book.status {
-                            case .active:
-                                ActiveBookView(book: book)
+                            if book.status == .active || (book.status == .locked && store.purchased.contains(book.image)) {
+                                    ActiveBookView(book: book)
+                                    .task {
+                                        game.fetcher.changeBookStatus(of: book.id, to: .active)
+                                    }
                                     .onTapGesture {
                                         game.fetcher.changeBookStatus(of: book.id, to: .inactive)
                                     }
-                            case .inactive:
+                            } else if book.status == .inactive {
                                 InactiveBookView(book: book)
                                     .onTapGesture {
                                         game.fetcher.changeBookStatus(of: book.id, to: .active)
                                     }
-                            default:
+                            } else {
                                 LockedBookView(book: book)
                                     .onTapGesture {
-                                        showFakeAlert.toggle()
-                                        
-                                        game.fetcher.changeBookStatus(of: book.id, to: .active)
+                                        let product = store.products[book.id-4]
+                                        Task {
+                                            await store.purchase(product)
+                                        }
                                     }
                             }
                         }
@@ -67,6 +71,7 @@ struct SelectBooksView: View {
                 }
                 
                 Button {
+                    game.fetcher.saveStatus()
                     dismiss()
                 } label: {
                     Text("Done")
@@ -81,9 +86,9 @@ struct SelectBooksView: View {
             .padding(.horizontal, 20)
             .padding(.top, 40)
         }
-        .interactiveDismissDisabled(!activeBooks)
-        .alert("You have purchased the selected content! Enjoy 😄", isPresented: $showFakeAlert) {
-            
+        .interactiveDismissDisabled()
+        .task {
+            await store.loadProducts()
         }
     }
 }

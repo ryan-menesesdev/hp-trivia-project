@@ -31,7 +31,7 @@ struct ContentView: View {
         .ignoresSafeArea()
         .onAppear {
             animateViewsIn.toggle()
-//            playAudio()
+            playAudio()
         }
         .fullScreenCover(isPresented: $playGame) {
             QuestionView()
