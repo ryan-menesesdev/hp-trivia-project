@@ -35,32 +35,7 @@ struct SelectBooksView: View {
                 Spacer()
                 
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(), GridItem()]) {
-                        ForEach(game.fetcher.books) { book in
-                            if book.status == .active || (book.status == .locked && store.purchased.contains(book.image)) {
-                                    ActiveBookView(book: book)
-                                    .task {
-                                        game.fetcher.changeBookStatus(of: book.id, to: .active)
-                                    }
-                                    .onTapGesture {
-                                        game.fetcher.changeBookStatus(of: book.id, to: .inactive)
-                                    }
-                            } else if book.status == .inactive {
-                                InactiveBookView(book: book)
-                                    .onTapGesture {
-                                        game.fetcher.changeBookStatus(of: book.id, to: .active)
-                                    }
-                            } else {
-                                LockedBookView(book: book)
-                                    .onTapGesture {
-                                        let product = store.products[book.id-4]
-                                        Task {
-                                            await store.purchase(product)
-                                        }
-                                    }
-                            }
-                        }
-                    }
+                    BooksAvailableView(store: store)
                 }
                 .foregroundStyle(.black)
                 
@@ -71,7 +46,11 @@ struct SelectBooksView: View {
                 }
                 
                 Button {
-                    game.fetcher.saveStatus()
+                    do {
+                        try game.fetcher.saveStatus()
+                    } catch {
+                        print("Unexpected error: \(error)")
+                    }
                     dismiss()
                 } label: {
                     Text("Done")
@@ -88,7 +67,11 @@ struct SelectBooksView: View {
         }
         .interactiveDismissDisabled()
         .task {
-            await store.loadProducts()
+            do {
+                try await store.loadProducts()
+            } catch {
+                print("Unexpected error: \(error)")
+            }
         }
     }
 }

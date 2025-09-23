@@ -7,20 +7,37 @@ class FetchBookQuestions {
     let savePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "bookStatuses")
     
     init() {
-        loadStatus()
+        do {
+            try loadStatus()
+        } catch let error as FetchError {
+            print(error.message)
+            books = []
+        } catch {
+            print("Unexpected error: \(error)")
+            books = []
+        }
     }
     
-    private func decodeQuestions() -> [Question] {
+    private func decodeQuestions() throws -> [Question] {
         var decodedQuestions = [Question]()
-        
-        if let url = Bundle.main.url(forResource: "trivia", withExtension: "json") {
-            do {
-                let questionData = try Data(contentsOf: url)
-                decodedQuestions = try JSONDecoder().decode([Question].self, from: questionData)
-            } catch {
-                print("Error during JSON decoding")
+        do {
+            guard let url = Bundle.main.url(forResource: "trivia", withExtension: "json") else {
+                throw FetchError.badUrlError
             }
+
+            let questionData = try Data(contentsOf: url)
+            decodedQuestions = try JSONDecoder().decode([Question].self, from: questionData)
+            
+        } catch FetchError.badUrlError {
+            print(FetchError.badUrlError.message)
+            throw FetchError.badUrlError
+        } catch is DecodingError {
+            print(FetchError.decodingError.message)
+            throw FetchError.decodingError
+        } catch {
+            print("Unexpected error: \(error)")
         }
+        
         return decodedQuestions
     }
     
@@ -48,23 +65,32 @@ class FetchBookQuestions {
         books[id-1].status = newStatus
     }
     
-    func saveStatus() {
+    func saveStatus() throws {
         do {
             let data = try JSONEncoder().encode(books)
-            try data.write(to: savePath)
+            try data.write(to: savePath) //validar depois se há alguma forma de jogar um erro específico
+        } catch is EncodingError {
+            print(FetchError.encodingError.message)
+            throw FetchError.encodingError
         } catch {
-            print("Unable to save data: \(error)")
+            print(DataError.failedToWriteDataError)
+            throw DataError.failedToWriteDataError
         }
     }
     
-    func loadStatus() {
+    func loadStatus() throws {
         do {
             let data = try Data(contentsOf: savePath)
             books = try JSONDecoder().decode([Book].self, from: data)
         } catch {
-            let decodedQuestions = decodeQuestions()
-            let organizedQuestions = organizeQuestions(decodedQuestions)
-            populateBooks(with: organizedQuestions)
+            do {
+                let decodedQuestions = try decodeQuestions()
+                let organizedQuestions = organizeQuestions(decodedQuestions)
+                populateBooks(with: organizedQuestions)
+            } catch let fetchError as FetchError {
+                print(fetchError.message)
+                throw fetchError
+            }
         }
     }
 }

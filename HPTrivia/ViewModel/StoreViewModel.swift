@@ -12,18 +12,19 @@ class StoreViewModel {
         updates = watchForUpdates()
     }
     
-    func loadProducts() async {
+    func loadProducts() async throws {
         do {
             products = try await Product.products(for: ["hp4", "hp5", "hp6", "hp7"])
             products.sort {
                 $0.displayName < $1.displayName
             }
         } catch {
-            print("Unable to load products: \(error)")
+            print(StoreError.failedToLoadProductsError.message)
+            throw ViewError.store(.failedToLoadProductsError)
         }
     }
     
-    func purchase(_ product: Product) async {
+    func purchase(_ product: Product) async throws {
         do {
             let result = try await product.purchase()
             
@@ -52,7 +53,8 @@ class StoreViewModel {
                 break
             }
         } catch {
-            
+            print(StoreError.failedToPurcharseError.message)
+            throw ViewError.store(.failedToPurcharseError)
         }
     }
     
